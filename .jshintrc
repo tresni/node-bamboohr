@@ -1,0 +1,6 @@
+{
+  "node": true,
+  "quotmark": "single",
+  "laxcomma": true,
+  "asi": true
+}

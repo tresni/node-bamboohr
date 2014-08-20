@@ -1,0 +1,19 @@
+{
+    "name": "node-bamboohr",
+    "version": "0.0.1",
+    "description": "Node.js wrapper around the bamboohr.com API",
+    "keywords": [
+        "bamboohr"
+    ],
+    "author": "Brian A. Hartvigsen <brian.andrew@brianandjenny.com>",
+    "license": "MIT",
+    "private": true,
+    "dependencies": {
+        "request": "*",
+        "xml2js": "*"
+    },
+    "devDependencies": {
+        "mocha": "*",
+        "nock": "*"
+    }
+}
