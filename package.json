@@ -6,6 +6,11 @@
         "bamboohr"
     ],
     "author": "Brian A. Hartvigsen <brian.andrew@brianandjenny.com>",
+    "homepage": "https://github.com/tresni/node-bamboohr",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/tresni/node-networkedhelpdesk.git"
+    },
     "license": "MIT",
     "dependencies": {
         "request": "*",
