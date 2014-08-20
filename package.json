@@ -7,7 +7,6 @@
     ],
     "author": "Brian A. Hartvigsen <brian.andrew@brianandjenny.com>",
     "license": "MIT",
-    "private": true,
     "dependencies": {
         "request": "*",
         "xml2js": "*"
