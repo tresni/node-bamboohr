@@ -2,6 +2,7 @@ var request = require('request'),
     xml2js = require('xml2js'),
     util = require('util')
 
+/* UTILITY FUNCTIONS */
 function __Date_Helper(date) {
     /* if it's a Date, translate to appropriate format, otherwise assume we are
      * passing in the correct format
@@ -15,6 +16,19 @@ function __Date_Helper(date) {
     }
 }
 
+function __Field_Builder(fields) {
+    var f = []
+    for (var i in fields) {
+        f.push({
+            $: { id: i },
+            _: fields[i] || ''
+        })
+    }
+
+    return { field: f }
+}
+
+/* CLASSES */
 
 function BambooHR(options) {
     this.options = options
@@ -129,13 +143,7 @@ Employee.prototype.__parse_fields = function (fields) {
 }
 
 Employee.prototype.__to_xml = function () {
-    var f = { employee: { field: [] } }
-    for (var i in this.fields) {
-        f.employee.field.push({
-            $: { id: i },
-            _: this.fields[i] || ''
-        })
-    }
+    var f = { employee: __Field_Builder(this.fields) }
     return (new xml2js.Builder()).buildObject(f)
 }
 
@@ -219,15 +227,9 @@ Employee.prototype.__table_handler = function () {
     }
     else {
         var rowdata = args.pop()
-        var f = { row : { field: []  } }
-        for (var i in rowdata) {
-            f.row.field.push({
-                $: { id: i },
-                _: rowdata[i] || ''
-            })
-        }
-
+        var f = { row : __Field_Builder(rowdata) }
         var xml = (new xml2js.Builder()).buildObject(f)
+
         if (args.length) {
             var rowid = args[0]
             this.parent.__post('employees/' + this.id + '/tables/' + table + '/' + rowid, null, xml, callback)
