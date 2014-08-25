@@ -50,6 +50,9 @@ suite('BambooHR', function () {
                 // .employee(123).requests()
                 .get('/api/gateway.php/test/v1/time_off/requests/?employeeId=123')
                 .reply(200, '<requests><request id="1"><employee id="1">Jon Doe</employee><status lastChanged="2011-08-14" lastChangedByUserId="1">approved</status><start>2001-01-01</start><end>2001-01-06</end><created>2011-08-13</created><type id="1">Vacation</type><amount unit="days">5</amount><notes><note from="employee">Relaxing in the country for a few days.</note><note from="manager">Have fun!</note></notes><dates> <!-- This element may not be available for all requests --><date ymd="2001-01-01" amount="1"/><date ymd="2001-01-02" amount="1"/><date ymd="2001-01-03" amount="1"/><!-- dates with a 0 amount may not be included in the results. Included here for clarity --><date ymd="2001-01-04" amount="0"/> <date ymd="2001-01-05" amount="1"/><date ymd="2001-01-06" amount="1"/></dates></request></requests>')
+                // .employee(100).jobInfo()
+                .get('/api/gateway.php/test/v1/employees/100/tables/jobInfo/')
+                .reply(200, '<table><row id="1" employeeId="100"><field id="date">2010-06-01</field><field id="location">New York Office</field><field id="division">Sprockets</field><field id="department">Research and Development</field><field id="jobTitle">Machinist</field><field id="reportsTo">John Smith</field></row><row id="2" employeeId="100"><field id="date">2009-03-01</field><field id="location">New York Office</field><field id="division">Sprockets</field><field id="department">Sales</field><field id="jobTitle">Salesman</field><field id="reportsTo">Jane Doe</field></row></table>')
         })
 
         test('.employees should returns a list of employees', function (done) {
@@ -143,6 +146,15 @@ suite('BambooHR', function () {
         test('.requests returns a list of requests', function (done) {
             bamboo.employee(123).requests(function (err, resp) {
                 if (err) { return done(err) }
+                assert(resp instanceof Array)
+
+                done()
+            })
+        })
+
+        test('.jobInfo returns list of jobs', function (done) {
+            bamboo.employee(100).jobInfo(function (err, resp) {
+                if (err) { return done (err) }
                 assert(resp instanceof Array)
 
                 done()

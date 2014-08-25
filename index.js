@@ -180,4 +180,74 @@ Employee.prototype.requests = function () {
     })
 }
 
+Employee.prototype.__table_handler = function () {
+    var args = Array.prototype.slice.call(arguments, 0)
+    var table = args.shift()
+    var callback = args.pop()
+
+    // getter
+    if (args.length === 0) {
+        this.parent.__get('employees/' + this.id + '/tables/' + table + '/', null, function (err, resp) {
+            if (err) { return callback(err) }
+            callback(null, resp.table.row)
+        })
+    }
+    else {
+        var rowdata = args.pop()
+        var f = { row : { field: []  } }
+        for (var i in rowdata) {
+            f.row.field.push({
+                $: { id: i },
+                _: rowdata[i] || ''
+            })
+        }
+
+        var xml = (new xml2js.Builder()).buildObject(f)
+        return (new xml2js.Builder()).buildObject(f)
+        if (args.length) {
+            var rowid = args[0]
+            this.parent.__post('employees/' + this.id + '/tables/' + table + '/' + rowid, null, xml, callback)
+        }
+        else {
+            this.parent.__post('employees/' + this.id + '/tables/' + table, null, xml, callback)
+        }
+    }
+}
+
+Employee.prototype.jobInfo = function () {
+    var args = Array.prototype.slice.call(arguments, 0)
+    args.unshift('jobInfo')
+    return this.__table_handler.apply(this, args)
+}
+
+Employee.prototype.employmentStatus = function () {
+    var args = Array.prototype.slice.call(arguments, 0)
+    args.unshift('employmentStatus')
+    return this.__table_handler.apply(this, args)
+}
+
+Employee.prototype.compensation = function () {
+    var args = Array.prototype.slice.call(arguments, 0)
+    args.unshift('compensation')
+    return this.__table_handler.apply(this, args)
+}
+
+Employee.prototype.dependents = function () {
+    var args = Array.prototype.slice.call(arguments, 0)
+    args.unshift('dependents')
+    return this.__table_handler.apply(this, args)
+}
+
+Employee.prototype.contacts = function () {
+    var args = Array.prototype.slice.call(arguments, 0)
+    args.unshift('contacts')
+    return this.__table_handler.apply(this, args)
+}
+
+Employee.prototype.customTable = function () {
+    //var args = Array.prototype.slice.call(arguments, 0)
+    //args.unshift('contacts')
+    return this.__table_handler.apply(this, args)
+}
+
 module.exports = BambooHR
