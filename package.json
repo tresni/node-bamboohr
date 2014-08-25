@@ -19,5 +19,8 @@
     "devDependencies": {
         "mocha": "*",
         "nock": "*"
+    },
+    "scripts": {
+        "test": "./node_modules/mocha/bin/mocha"
     }
 }
