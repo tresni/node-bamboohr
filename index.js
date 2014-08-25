@@ -161,21 +161,22 @@ Employee.prototype.add = function (callback) {
     })
 }
 
+// Just a utility function for bamboohr.requests({employeeId: this.id})
 Employee.prototype.requests = function () {
     var args = Array.prototype.slice.call(arguments, 0)
     var callback = args.pop()
 
-    var options = util._extend({employeeId: this.id}, args[0])
+    var options = util._extend({employeeId: this.id}, args[0] || {})
 
-    this.parent.__get('time_off/requests/', options, function (err, response) {
+    self = this
+    this.parent.requests(options, function (err, response) {
         if (err) { return callback(err) }
 
-        var requests = response.requests.request
-        return callback(null, requests)
-
-        for (var i in requests) {
-            // create a TimeOffRequest object with this Employee as the parent
+        for (var req in response) {
+            // Set parent to this object
         }
+
+        callback(null, response);
     })
 }
 
