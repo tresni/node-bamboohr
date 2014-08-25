@@ -2,6 +2,19 @@ var request = require('request'),
     xml2js = require('xml2js'),
     util = require('util')
 
+function __Date_Helper(date) {
+    /* if it's a Date, translate to appropriate format, otherwise assume we are
+     * passing in the correct format
+     */
+
+    if (date instanceof Date) {
+        return date.getFullYear() + '-' + (date.getMonth() < 9 ? '0' : '') + (date.getMonth() + 1) + '-' + (date.getDate() < 10 ? '0' :'') + date.getDate()
+    }
+    else {
+        return date
+    }
+}
+
 
 function BambooHR(options) {
     this.options = options
@@ -92,6 +105,9 @@ BambooHR.prototype.requests = function () {
 }
 
 BambooHR.prototype.whosOut = function (start, end, callback) {
+    start = __Date_Helper(start)
+    end = __Date_Helper(end)
+
     this.__get('time_off/whos_out', {
         start: start,
         end: end
@@ -177,6 +193,15 @@ Employee.prototype.requests = function () {
         }
 
         callback(null, response);
+    })
+}
+
+Employee.prototype.estimates = function(end, callback) {
+    end = __Date_Helper(end)
+
+    this.parent.__get('employees/' + this.id + '/time_off/calculator/', {end: end}, function (err, resp) {
+        if (err) { return callback(err) }
+        callback(null, resp.estimates.estimate)
     })
 }
 

@@ -59,7 +59,12 @@ suite('BambooHR', function () {
                 // .employee(100).jobInfo(rowId, w/ data)
                 .post('/api/gateway.php/test/v1/employees/100/tables/jobInfo/1', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<row>\n  <field id="date">2010-06-01</field>\n  <field id="location">New York Office</field>\n  <field id="division">Sprockets</field>\n  <field id="department">Research and Development</field>\n  <field id="jobTitle">Machinist</field>\n  <field id="reportsTo">John Smith</field>\n</row>')
                 .reply(201, '')
-
+                // .employee(1).estimates(w/ string)
+                .get('/api/gateway.php/test/v1/employees/1/time_off/calculator/?end=2013-12-31')
+                .reply(200, '<estimates end="2013-12-31"><estimate timeOffType="5" name="Bereavement" balance="-2.5"/> <estimate timeOffType="6" name="Jury duty" balance="-8.0"/> <estimate timeOffType="2" name="Sick" balance="16.0"/><estimate timeOffType="1" name="Vacation" balance="40.0"/> </estimates>')
+                // .employee(1).estimates(w/ Date)
+                .get('/api/gateway.php/test/v1/employees/1/time_off/calculator/?end=2013-12-31')
+                .reply(200, '<estimates end="2013-12-31"><estimate timeOffType="5" name="Bereavement" balance="-2.5"/> <estimate timeOffType="6" name="Jury duty" balance="-8.0"/> <estimate timeOffType="2" name="Sick" balance="16.0"/><estimate timeOffType="1" name="Vacation" balance="40.0"/> </estimates>')
         })
 
         test('.employees should returns a list of employees', function (done) {
@@ -197,6 +202,24 @@ suite('BambooHR', function () {
 
             bamboo.employee(100).jobInfo(1, data, function (err, resp) {
                 if (err) { return done(err) }
+
+                done()
+            })
+        })
+
+        test('.estimates(w/ string) returns time off estimates', function (done) {
+            bamboo.employee(1).estimates('2013-12-31', function (err, resp) {
+                if (err) { return done(err) }
+                assert(resp instanceof Array)
+
+                done()
+            })
+        })
+
+        test('.estimates(w/ Date) returns time off estimates', function (done) {
+            bamboo.employee(1).estimates(new Date(2013, 11, 31), function (err, resp) {
+                if (err) { return done(err) }
+                assert(resp instanceof Array)
 
                 done()
             })
