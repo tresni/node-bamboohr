@@ -203,7 +203,6 @@ Employee.prototype.__table_handler = function () {
         }
 
         var xml = (new xml2js.Builder()).buildObject(f)
-        return (new xml2js.Builder()).buildObject(f)
         if (args.length) {
             var rowid = args[0]
             this.parent.__post('employees/' + this.id + '/tables/' + table + '/' + rowid, null, xml, callback)

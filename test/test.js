@@ -45,7 +45,7 @@ suite('BambooHR', function () {
                 // employee(123).get() & update()
                 .get('/api/gateway.php/test/v1/employees/123?fields=firstName%2ClastName')
                 .reply(200, '<employee id="123"><field id="firstName">John</field><field id="lastName">Doe</field></employee>')
-                .post('/api/gateway.php/test/v1/employees/123',  '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<employee>\n  <field id="firstName">Jane</field>\n  <field id="lastName">Doe</field>\n</employee>')
+                .post('/api/gateway.php/test/v1/employees/123', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<employee>\n  <field id="firstName">Jane</field>\n  <field id="lastName">Doe</field>\n</employee>')
                 .reply(200, '')
                 // .employee(123).requests()
                 .get('/api/gateway.php/test/v1/time_off/requests/?employeeId=123')
@@ -53,6 +53,13 @@ suite('BambooHR', function () {
                 // .employee(100).jobInfo()
                 .get('/api/gateway.php/test/v1/employees/100/tables/jobInfo/')
                 .reply(200, '<table><row id="1" employeeId="100"><field id="date">2010-06-01</field><field id="location">New York Office</field><field id="division">Sprockets</field><field id="department">Research and Development</field><field id="jobTitle">Machinist</field><field id="reportsTo">John Smith</field></row><row id="2" employeeId="100"><field id="date">2009-03-01</field><field id="location">New York Office</field><field id="division">Sprockets</field><field id="department">Sales</field><field id="jobTitle">Salesman</field><field id="reportsTo">Jane Doe</field></row></table>')
+                // .employee(100).jobInfo(w/ data)
+                .post('/api/gateway.php/test/v1/employees/100/tables/jobInfo', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<row>\n  <field id="date">2010-06-01</field>\n  <field id="location">New York Office</field>\n  <field id="division">Sprockets</field>\n  <field id="department">Research and Development</field>\n  <field id="jobTitle">Machinist</field>\n  <field id="reportsTo">John Smith</field>\n</row>')
+                .reply(201, '')
+                // .employee(100).jobInfo(rowId, w/ data)
+                .post('/api/gateway.php/test/v1/employees/100/tables/jobInfo/1', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<row>\n  <field id="date">2010-06-01</field>\n  <field id="location">New York Office</field>\n  <field id="division">Sprockets</field>\n  <field id="department">Research and Development</field>\n  <field id="jobTitle">Machinist</field>\n  <field id="reportsTo">John Smith</field>\n</row>')
+                .reply(201, '')
+
         })
 
         test('.employees should returns a list of employees', function (done) {
@@ -154,8 +161,42 @@ suite('BambooHR', function () {
 
         test('.jobInfo returns list of jobs', function (done) {
             bamboo.employee(100).jobInfo(function (err, resp) {
-                if (err) { return done (err) }
+                if (err) { return done(err) }
                 assert(resp instanceof Array)
+
+                done()
+            })
+        })
+
+        test('.jobInfo(w/ data) creates a new row', function (done) {
+            var data = {
+                date: '2010-06-01',
+                location: 'New York Office',
+                division: 'Sprockets',
+                department: 'Research and Development',
+                jobTitle: 'Machinist',
+                reportsTo: 'John Smith'
+            }
+
+            bamboo.employee(100).jobInfo(data, function (err, resp) {
+                if (err) { return done(err) }
+
+                done()
+            })
+        })
+
+        test('.jobInfo(rowId, w/ data) updates a row', function (done) {
+            var data = {
+                date: '2010-06-01',
+                location: 'New York Office',
+                division: 'Sprockets',
+                department: 'Research and Development',
+                jobTitle: 'Machinist',
+                reportsTo: 'John Smith'
+            }
+
+            bamboo.employee(100).jobInfo(1, data, function (err, resp) {
+                if (err) { return done(err) }
 
                 done()
             })
