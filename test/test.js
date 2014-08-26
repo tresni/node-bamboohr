@@ -74,10 +74,12 @@ suite('BambooHR', function () {
         })
 
         test('.add should get a result', function (done) {
-            bamboo.employee(null, {firstName: 'John', lastName: 'Doe'}).add(function (err, resp) {
+            bamboo.employee({firstName: 'John', lastName: 'Doe'}).add(function (err, resp) {
                 if (err){ return done(err) }
                 assert(resp instanceof Object)
                 assert.equal(resp.id, 124)
+                assert.equal(resp.fields.firstName, 'John')
+                assert.equal(resp.fields.lastName, 'Doe')
 
                 done()
             })
