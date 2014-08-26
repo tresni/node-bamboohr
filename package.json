@@ -1,6 +1,6 @@
 {
     "name": "node-bamboohr",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Node.js wrapper around the bamboohr.com API",
     "keywords": [
         "bamboohr"
@@ -9,7 +9,7 @@
     "homepage": "https://github.com/tresni/node-bamboohr",
     "repository": {
         "type": "git",
-        "url": "git://github.com/tresni/node-networkedhelpdesk.git"
+        "url": "git://github.com/tresni/node-bamboohr.git"
     },
     "license": "MIT",
     "dependencies": {
