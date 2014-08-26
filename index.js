@@ -82,8 +82,16 @@ BambooHR.prototype.__get = function (uri, options, callback) {
     this.__request('get', uri, qs, null, callback)
 }
 
-BambooHR.prototype.employee = function (id, fields) {
-    return new Employee(this, id, fields)
+BambooHR.prototype.employee = function () {
+    var args = Array.prototype.slice.call(arguments, 0)
+    var fields = args.pop()
+
+    if (fields instanceof Object) {
+        return new Employee(this, args[0] || null, fields)
+    }
+    else {
+        return new Employee(this, fields)
+    }
 }
 
 BambooHR.prototype.employees = function (callback) {
@@ -130,10 +138,19 @@ BambooHR.prototype.whosOut = function (start, end, callback) {
 
 //-- Employee Class
 
-function Employee(parent, id, fields) {
+function Employee(parent) {
+    var args = Array.prototype.slice.call(arguments, 1)
     this.parent = parent
-    this.id = id
-    this.fields = fields || {}
+
+    var fields = args.pop()
+    if (fields instanceof Object) {
+        this.fields = fields
+        this.id = args[0] || null
+    }
+    else {
+        this.id = fields
+        this.fields = {}
+    }
 }
 
 Employee.prototype.__parse_fields = function (fields) {
