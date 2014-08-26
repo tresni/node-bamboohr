@@ -148,18 +148,14 @@ Employee.prototype.__to_xml = function () {
 }
 
 Employee.prototype.get = function () {
-    var options, id
+    var options
     var args = Array.prototype.slice.call(arguments, 0)
     var callback = args.pop()
-
-    if (!this.id) {
-        id = args.shift()
-    }
 
     options = args.length ? { fields: args.join(',') } : {}
 
     var self = this
-    this.parent.__get('employees/' + (this.id || id || 0), options, function (err, response) {
+    this.parent.__get('employees/' + (this.id || 0), options, function (err, response) {
         if (err) { return callback(err) }
 
         var emp = new Employee(self.parent);

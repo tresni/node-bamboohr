@@ -30,9 +30,6 @@ suite('BambooHR', function () {
                 // .get()
                 .get('/api/gateway.php/test/v1/employees/0')
                 .reply(200, '<employee id="123"></employee>')
-                // .get(123)
-                .get('/api/gateway.php/test/v1/employees/123')
-                .reply(200, '<employee id="123"></employee>')
                 // employee(123).get()
                 .get('/api/gateway.php/test/v1/employees/123')
                 .reply(200, '<employee id="123"></employee>')
@@ -96,17 +93,6 @@ suite('BambooHR', function () {
             })
         })
 
-        test('.get returns an employee with the supplied id', function (done) {
-            bamboo.employee().get(123, function (err, resp) {
-                if (err) { return done(err) }
-                assert(resp instanceof Object)
-                assert(resp.id)
-                assert.equal(resp.id, 123)
-
-                done()
-            })
-        })
-
         test('.get gets the right person if you supplied id to employee()', function (done) {
             bamboo.employee(123).get(function (err, resp) {
                 if (err) { return done(err) }
@@ -119,7 +105,7 @@ suite('BambooHR', function () {
         })
 
         test('.get knows to get additional fields', function (done) {
-            bamboo.employee().get(123, 'firstName', 'lastName', function (err, resp) {
+            bamboo.employee(123).get('firstName', 'lastName', function (err, resp) {
                 if (err) { return done(err) }
                 assert(resp instanceof Object)
                 assert.equal(resp.id, 123)
