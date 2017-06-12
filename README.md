@@ -23,7 +23,7 @@ bamboohr.employee(100).get('firstName', 'lastName', function (err, employee) {
 
 ## Test
 
-Tests are written using [mocha](visionmedia.github.io/mocha/) and [nock](https://github.com/pgte/nock) and can be found in the [test](test) folder.  Execute `npm test` to run the test suite.
+Tests are written using [mocha](http://mochajs.org/) and [nock](https://github.com/pgte/nock) and can be found in the [test](test) folder.  Execute `npm test` to run the test suite.
 
 ## API
 
