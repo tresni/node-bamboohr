@@ -1,4 +1,4 @@
-var BambooHR = require('./../index')
+var BambooHR = require('../lib/index')
 
 var nock = require('nock')
 nock.disableNetConnect();

@@ -22,5 +22,6 @@
     },
     "scripts": {
         "test": "./node_modules/mocha/bin/mocha"
-    }
+    },
+    "main": "lib/index.js"
 }
