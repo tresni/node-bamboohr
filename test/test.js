@@ -1,8 +1,9 @@
-var BambooHR = require('./../index')
+var BambooHR = require('../lib/index')
 
 var nock = require('nock')
 nock.disableNetConnect();
 
+var xml2js = require('xml2js')
 var assert = require('assert')
 
 suite('BambooHR', function () {
@@ -231,14 +232,45 @@ suite('BambooHR', function () {
                 .reply(200, '<requests><request id="1"><employee id="1">Jon Doe</employee><status lastChanged="2011-08-14" lastChangedByUserId="1">approved</status><start>2001-01-01</start><end>2001-01-06</end><created>2011-08-13</created><type id="1">Vacation</type><amount unit="days">5</amount><notes><note from="employee">Relaxing in the country for a few days.</note><note from="manager">Have fun!</note></notes><dates> <!-- This element may not be available for all requests --><date ymd="2001-01-01" amount="1"/><date ymd="2001-01-02" amount="1"/><date ymd="2001-01-03" amount="1"/><!-- dates with a 0 amount may not be included in the results. Included here for clarity --><date ymd="2001-01-04" amount="0"/> <date ymd="2001-01-05" amount="1"/><date ymd="2001-01-06" amount="1"/></dates></request></requests>')
                 .get('/api/gateway.php/test/v1/time_off/requests/?start=2011-09-01&end=2011-09-11&type=1&status=approved')
                 .reply(200, '<requests><request id="1"><employee id="1">Jon Doe</employee><status lastChanged="2011-08-14" lastChangedByUserId="1">approved</status><start>2001-01-01</start><end>2001-01-06</end><created>2011-08-13</created><type id="1">Vacation</type><amount unit="days">5</amount><notes><note from="employee">Relaxing in the country for a few days.</note><note from="manager">Have fun!</note></notes><dates> <!-- This element may not be available for all requests --><date ymd="2001-01-01" amount="1"/><date ymd="2001-01-02" amount="1"/><date ymd="2001-01-03" amount="1"/><!-- dates with a 0 amount may not be included in the results. Included here for clarity --><date ymd="2001-01-04" amount="0"/> <date ymd="2001-01-05" amount="1"/><date ymd="2001-01-06" amount="1"/></dates></request></requests>')
+                .put('/api/gateway.php/test/v1/employees/1/time_off/request/', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<request>\n  <status>approved</status>\n  <start>2011-10-01</start>\n  <end>2011-10-02</end>\n  <timeOffTypeId>1</timeOffTypeId>\n  <amount>12</amount>\n  <previousRequest>10</previousRequest>\n  <notes>\n    <note from="employee">Having wisdom teeth removed</note>\n    <note from="manager">Get well soon</note>\n  </notes>\n  <dates>\n    <date amount="8" ymd="2011-10-01"/>\n    <date amount="4" ymd="2011-10-02"/>\n  </dates>\n</request>')
+                .reply(201)
+                .put('/api/gateway.php/test/v1/time_off/requests/10/status/', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<request>\n  <status>approved</status>\n  <note>Have fun!</note>\n</request>')
+                .reply(201)
         })
+
 
         test('We should get a list of time off requests with no supplied arguments', function (done) {
 
             bamboo.requests(function (err, resp) {
                 if (err){ return done(err) }
                 assert(resp instanceof Array)
-
+                assert.equal(resp[0].id, 1)
+                assert.equal(resp[0].employeeId, 1)
+                assert.equal(resp[0].employeeName, 'Jon Doe')
+                assert.equal(resp[0].status, 'approved')
+                assert.equal(resp[0].statusLastChanged, '2011-08-14')
+                assert.equal(resp[0].statusLastChangedByUserId, 1)
+                assert.equal(resp[0].start, '2001-01-01')
+                assert.equal(resp[0].end, '2001-01-06')
+                assert.equal(resp[0].created, '2011-08-13')
+                assert.equal(resp[0].type, 'Vacation')
+                assert.equal(resp[0].typeId, 1)
+                assert.equal(resp[0].amount, 5)
+                assert.equal(resp[0].amountUnit, 'days')
+                assert.deepEqual(resp[0].notes, [{
+                    from: 'employee',
+                    note: 'Relaxing in the country for a few days.'
+                }, {
+                    from: 'manager',
+                note: 'Have fun!'
+                }])
+                assert.deepEqual(resp[0].dates.slice(0, 2), [{
+                    date: '2001-01-01',
+                    amount: 1
+                }, {
+                    date: '2001-01-02',
+                    amount: 1
+                }])
                 done()
             })
         })
@@ -249,6 +281,80 @@ suite('BambooHR', function () {
                 assert(resp instanceof Array)
 
                 done()
+            })
+        })
+
+        test('We should be able to add a time off request', function (done) {
+            bamboo.employee(1).requestTimeOff({
+                status: 'approved',
+                start: '2011-10-01',
+                end: new Date('2011/10/02'),
+                timeOffTypeId: 1,
+                amount: 12,
+                notes: [{
+                    from: 'employee',
+                    note: 'Having wisdom teeth removed'
+                }, {
+                    from: 'manager',
+                    note: 'Get well soon'
+                }],
+                dates: [{
+                    date: '2011-10-01',
+                    amount: 8
+                }, {
+                    date: '2011-10-02',
+                    amount: 4
+                }],
+                previousRequest: 10
+            }, done)
+        })
+
+        test('We should be able to change a time off request status', function (done) {
+            bamboo.timeOffRequest(10).changeStatus({
+                status: 'approved',
+                note: 'Have fun!'
+            }, done)
+        })
+
+        suiteTeardown(function() {
+            scope.done()
+        })
+    })
+
+
+    suite('Metadata', function () {
+        var scope;
+        var body = {
+            timeOffTypes: [{
+                id: '1',
+                name: 'Vacation',
+                units: 'hours',
+                color: 'eef448',
+                icon: 'palm-trees'
+            }],
+            defaultHours: [
+                { name: 'Saturday', amount: '0' },
+                { name: 'Sunday', amount: '0' },
+                { name: 'default', amount: '8' }
+            ]
+        };
+
+        suiteSetup(function() {
+            scope = nock('https://api.bamboohr.com', {
+                reqheaders: {
+                    authorization: 'Basic MTIzOng=',
+                    Accept: 'application/json'
+                }
+            })
+                .get('/api/gateway.php/test/v1/meta/time_off/types/')
+                .reply(200, body)
+        })
+
+
+        test('We should get a list of time off types', function (done) {
+            bamboo.timeOffTypes(function (err, res) {
+                assert.deepEqual(res, body);
+                done(err);
             })
         })
 
