@@ -320,4 +320,46 @@ suite('BambooHR', function () {
             scope.done()
         })
     })
+
+
+    suite('Metadata', function () {
+        var scope;
+        var body = {
+            timeOffTypes: [{
+                id: '1',
+                name: 'Vacation',
+                units: 'hours',
+                color: 'eef448',
+                icon: 'palm-trees'
+            }],
+            defaultHours: [
+                { name: 'Saturday', amount: '0' },
+                { name: 'Sunday', amount: '0' },
+                { name: 'default', amount: '8' }
+            ]
+        };
+
+        suiteSetup(function() {
+            scope = nock('https://api.bamboohr.com', {
+                reqheaders: {
+                    authorization: 'Basic MTIzOng=',
+                    Accept: 'application/json'
+                }
+            })
+                .get('/api/gateway.php/test/v1/meta/time_off/types/')
+                .reply(200, body)
+        })
+
+
+        test('We should get a list of time off types', function (done) {
+            bamboo.timeOffTypes(function (err, res) {
+                assert.deepEqual(res, body);
+                done(err);
+            })
+        })
+
+        suiteTeardown(function() {
+            scope.done()
+        })
+    })
 })
