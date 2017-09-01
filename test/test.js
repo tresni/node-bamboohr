@@ -236,6 +236,8 @@ suite('BambooHR', function () {
                 .reply(201)
                 .put('/api/gateway.php/test/v1/time_off/requests/10/status/', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<request>\n  <status>approved</status>\n  <note>Have fun!</note>\n</request>')
                 .reply(201)
+                .get('/api/gateway.php/test/v1/time_off/requests/?start=2011-12-31&end=2011-12-31')
+                .reply(200, '<requests></requests>')
         })
 
 
@@ -279,6 +281,15 @@ suite('BambooHR', function () {
             bamboo.requests({start: '2011-09-01', end: '2011-09-11', type: 1, status: 'approved'}, function (err, resp) {
                 if (err){ return done(err) }
                 assert(resp instanceof Array)
+
+                done()
+            })
+        })
+
+        test('We should not throw an error on empty results', function (done) {
+            bamboo.requests({start: '2011-12-31', end: '2011-12-31'}, function (err, resp) {
+                if (err){ return done(err) }
+                assert.deepEqual(resp, [])
 
                 done()
             })
